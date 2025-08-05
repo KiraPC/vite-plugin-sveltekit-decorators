@@ -16,11 +16,13 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
 ## Quick Start
 
 1. **Install the plugin**
+
    ```bash
    npm install vite-plugin-sveltekit-decorators
    ```
 
 2. **Add to your Vite configuration**
+
    ```javascript
    // vite.config.js
    import { sveltekit } from '@sveltejs/kit/vite';
@@ -38,6 +40,7 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
    ```
 
 3. **Create your decorator functions**
+
    ```typescript
    // src/+decorators.server.ts
    import type { 
@@ -75,6 +78,7 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
 ## Example
 
 Check out our [complete working example](./examples/simple-demo/) which demonstrates all features including:
+
 - Load function decoration
 - Actions decoration
 - API routes decoration
@@ -117,6 +121,7 @@ export const config = {
 ```
 
 Configuration options:
+
 - `true`: Enable for all functions
 - `false`: Disable completely  
 - `string[]`: Enable only for specific actions/HTTP methods
@@ -133,6 +138,7 @@ This plugin is **fully type-safe** and provides:
 ## Zero Code Changes Required
 
 The plugin works by **transforming your code at build time**. You don't need to:
+
 - Modify existing SvelteKit functions
 - Import anything in your route files
 - Change your development workflow
@@ -233,7 +239,7 @@ export const apiDecorator: ApiDecorator = (originalFunction, metadata) => {
 
 - SvelteKit project
 - Vite as build tool
-- Node.js 16+ 
+- Node.js 16+
 
 ## License
 
