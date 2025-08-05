@@ -1,0 +1,27 @@
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "debug.console.fontSize": 14,
+  "debug.console.lineHeight": 22,
+  "debug.showBreakpointsInOverviewRuler": true,
+  "files.associations": {
+    "*.svelte": "svelte"
+  },
+  "svelte.enable-ts-plugin": true,
+  "terminal.integrated.fontSize": 13,
+  "npm.packageManager": "npm",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.svelte-kit": true
+  },
+  "files.exclude": {
+    "**/.svelte-kit": true,
+    "**/node_modules": true
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "name": "vite-plugin-sveltekit-decorators",
+  "version": "0.1.0",
+  "description": "Vite plugin that automatically decorates SvelteKit functions.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/types.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "dev": "npm run build && cd examples/simple-demo && npm run dev"
+  },
+  "keywords": [
+    "vite",
+    "plugin",
+    "sveltekit",
+    "decorators",
+    "wrappers",
+    "logging",
+    "auto-wrap"
+  ],
+  "author": "Pasquale Carmine Carbone",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KiraPC/vite-plugin-sveltekit-decorators.git"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0",
+    "@sveltejs/kit": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "prettier": "^3.3.0",
+    "vitest": "^2.0.0",
+    "@vitest/coverage-v8": "^2.0.0"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
+    "@babel/types": "^7.28.0",
+    "@babel/generator": "^7.28.0",
+    "magic-string": "^0.30.0"
+  }
+}

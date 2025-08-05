@@ -1,0 +1,20 @@
+*.log
+.DS_Store
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.vite/
+.svelte-kit/
+coverage/
+.nyc_output/
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.stylelintcache
+
+# Development and internal files
+.github/instructions/
+.github/prompts/

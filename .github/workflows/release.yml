@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+        
+      - name: Run tests
+        run: npm test
+        
+      - name: Build package
+        run: npm run build
+        
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            ## vite-plugin-sveltekit-decorators v${{ steps.get_version.outputs.VERSION }}
+            
+            ### 🚀 Features
+            - Automatic decoration of SvelteKit functions
+            - TypeScript support with full type safety
+            - Zero configuration required
+            - Granular control over decoration
+            - Performance monitoring capabilities
+            
+            ### 📦 Installation
+            ```bash
+            npm install vite-plugin-sveltekit-decorators
+            ```
+            
+            ### 🔗 Quick Start
+            ```javascript
+            // vite.config.js
+            import { sveltekit } from '@sveltejs/kit/vite';
+            import { svelteKitDecorators } from 'vite-plugin-sveltekit-decorators';
+
+            export default {
+              plugins: [
+                sveltekit(),
+                svelteKitDecorators()
+              ]
+            };
+            ```
+            
+            ### 📚 Documentation
+            - [README](https://github.com/KiraPC/vite-plugin-sveltekit-decorators#readme)
+            - [Examples](https://github.com/KiraPC/vite-plugin-sveltekit-decorators/tree/main/examples/simple-demo)
+            
+            ---
+            **Full Changelog**: https://github.com/KiraPC/vite-plugin-sveltekit-decorators/compare/v${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
