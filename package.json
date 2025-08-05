@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-sveltekit-decorators",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Vite plugin that automatically decorates SvelteKit functions.",
   "type": "module",
   "main": "dist/index.js",
@@ -33,7 +33,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KiraPC/vite-plugin-sveltekit-decorators.git"
+    "url": "git+https://github.com/KiraPC/vite-plugin-sveltekit-decorators.git"
   },
   "peerDependencies": {
     "vite": "^5.0.0",
