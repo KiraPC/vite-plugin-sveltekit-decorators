@@ -1,9 +1,8 @@
 <script lang="ts">
   import { enhance } from '$app/forms';
-  import type { ActionData, PageData } from './$types.js';
   
-  export let data: PageData;
-  export let form: ActionData;
+  export let data;
+  export let form;
 </script>
 
 <svelte:head>
@@ -14,25 +13,25 @@
   <h1>🚀 SvelteKit AutoWrap Demo</h1>
   
   <div class="info">
-    <p>Apri la console del browser (F12) per vedere i log automatici!</p>
+    <p>Open the browser console (F12) to see automatic logs!</p>
     <p>Page loaded at: {data.timestamp}</p>
     <p>URL: {data.url}</p>
-    <p><a href="/opt-out-test">Test Opt-out Page</a> (senza wrapper)</p>
-    <p><a href="/granular-test">Test Configurazione Granulare</a> (load sì, actions no)</p>
+    <p><a href="/opt-out-test">Test Opt-out Page</a> (without wrapper)</p>
+    <p><a href="/granular-test">Test Granular Configuration</a> (load yes, actions no)</p>
   </div>
 
   <section class="todo-section">
-    <h2>📝 Todo List (con Actions)</h2>
+    <h2>📝 Todo List (with Actions)</h2>
     
-    <!-- Form per aggiungere nuovo item -->
+    <!-- Form to add new item -->
     <form method="POST" action="?/add" use:enhance>
       <input 
         type="text" 
         name="name" 
-        placeholder="Nuovo item..." 
+        placeholder="New item..." 
         required 
       />
-      <button type="submit">➕ Aggiungi</button>
+      <button type="submit">➕ Add</button>
     </form>
 
     {#if form?.error}
@@ -40,10 +39,10 @@
     {/if}
 
     {#if form?.success && form?.item}
-      <p class="success">✅ Item "{form.item.name}" aggiunto!</p>
+      <p class="success">✅ Item "{form.item.name}" added!</p>
     {/if}
 
-    <!-- Lista items -->
+    <!-- Items list -->
     <div class="items">
       {#each data.items as item}
         <div class="item" class:completed={item.completed}>
@@ -61,17 +60,17 @@
   </section>
 
   <section class="instructions">
-    <h2>🔍 Come Funziona</h2>
+    <h2>🔍 How It Works</h2>
     <ol>
-      <li>Apri la console del browser (F12)</li>
-      <li>Ricarica la pagina per vedere il log della <code>load</code> function</li>
-      <li>Aggiungi un nuovo item per vedere il log dell'action <code>add</code></li>
-      <li>Clicca su ✅ o ↩️ per vedere il log dell'action <code>toggle</code></li>
+      <li>Open the browser console (F12)</li>
+      <li>Reload the page to see the <code>load</code> function log</li>
+      <li>Add a new item to see the <code>add</code> action log</li>
+      <li>Click on ✅ or ↩️ to see the <code>toggle</code> action log</li>
     </ol>
     
     <p>
-      Tutte le funzioni server-side sono automaticamente wrapped dal plugin 
-      <strong>vite-plugin-sveltekit-autowrap</strong> senza modificare il codice!
+      All server-side functions are automatically wrapped by the 
+      <strong>vite-plugin-sveltekit-autowrap</strong> plugin without modifying the code!
     </p>
   </section>
 </main>

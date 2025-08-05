@@ -107,16 +107,24 @@ Check out our [complete working example](./examples/simple-demo/) which demonstr
 
 ### Granular Configuration
 
-You can configure decorators per page using the `decorators` configuration:
+You can configure decorators per page using the `decorators` configuration, following SvelteKit's convention:
 
 ```typescript
-// +page.server.ts
+// +page.server.ts - Just like other SvelteKit config exports!
 export const config = {
   decorators: {
     load: true,           // Enable load decoration
     actions: ['create'],  // Only decorate 'create' action
     api: false           // Disable API decoration
   }
+};
+
+export const load = async () => { /* automatically decorated */ };
+
+export const actions = {
+  create: async () => { /* decorated */ },
+  update: async () => { /* decorated */ },
+  delete: async () => { /* NOT decorated */ }
 };
 ```
 
@@ -125,6 +133,8 @@ Configuration options:
 - `true`: Enable for all functions
 - `false`: Disable completely  
 - `string[]`: Enable only for specific actions/HTTP methods
+
+**This follows the exact same pattern as SvelteKit's built-in configuration** - no new concepts to learn!
 
 ## Type Safety
 
@@ -145,6 +155,26 @@ The plugin works by **transforming your code at build time**. You don't need to:
 - Wrap functions manually
 
 Your existing code remains untouched and clean.
+
+## Easy Debugging & SvelteKit Conventions
+
+This plugin follows **SvelteKit's established patterns** for a familiar developer experience:
+
+- **Easy debugging:** Decorator files can be debugged normally with breakpoints - no special tooling required
+- **Familiar file structure:** Uses SvelteKit's `+` file conventions (`+decorators.ts`, `+decorators.server.ts`)
+- **SvelteKit-style configuration:** Per-route configuration using simple `export const config`, just like SvelteKit's own patterns
+
+```typescript
+// Debugging works exactly as you'd expect
+export const loadDecorator: ServerLoadDecorator = (originalFunction, metadata) => {
+  return async (event) => {
+    debugger; // ✅ Works perfectly!
+    console.log(`Loading ${metadata.functionName}...`);
+    const result = await originalFunction(event);
+    return result;
+  };
+};
+```
 
 ## Performance
 

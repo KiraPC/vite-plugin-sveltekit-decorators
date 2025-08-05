@@ -1,9 +1,7 @@
-import type { PageServerLoad } from './$types';
-
-// Disabilita il wrapping per questo file
+// Disable wrapping for this file
 export const config = { decorators: false };
 
-export const load: PageServerLoad = async () => {
+export const load = async () => {
   console.log('🚫 [OPT-OUT] Load function called - this should NOT be decorated (opted out)');
   
   return {

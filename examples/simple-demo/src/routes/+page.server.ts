@@ -1,5 +1,3 @@
-import type { Actions, PageServerLoad } from './$types';
-
 // Dati mock semplici
 const items = [
   { id: 1, name: 'Item 1', completed: false },
@@ -8,7 +6,7 @@ const items = [
 ];
 
 // Load function - will be automatically wrapped by the plugin
-export const load: PageServerLoad = async ({ url }) => {
+export const load = async ({ url }) => {
   // Simulate a small delay to better see the logs
   await new Promise(resolve => setTimeout(resolve, 100));
   
@@ -22,7 +20,7 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 // Actions - will be automatically wrapped by the plugin
-export const actions: Actions = {
+export const actions = {
   toggle: async ({ request }) => {
     const data = await request.formData();
     const id = Number(data.get('id'));

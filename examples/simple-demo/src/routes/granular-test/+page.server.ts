@@ -1,4 +1,4 @@
-// Configurazione granulare: disabilita solo le actions, mantieni load
+// Granular configuration: disable only actions, keep load
 export const config = {
   decorators: {
     load: true,     // Keep load function wrapping
