@@ -2,6 +2,12 @@
 
 A powerful Vite plugin that automatically decorates SvelteKit functions with customizable wrappers for logging, analytics, error handling, and more.
 
+## 🚀 Try it now
+
+**[Open in StackBlitz →](https://stackblitz.com/edit/github-adiyb5rg?file=src%2F%2Bdecorators.server.ts)**
+
+Experience the plugin in action with a live, interactive demo. No installation required!
+
 ## The Problem
 
 SvelteKit lacks a built-in way to execute common code across multiple functions (load functions, actions, API routes). This plugin solves that by providing a decorator pattern that allows you to:

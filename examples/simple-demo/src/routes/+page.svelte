@@ -6,17 +6,17 @@
 </script>
 
 <svelte:head>
-  <title>SvelteKit AutoWrap Simple Demo</title>
+  <title>SvelteKit Decorators Simple Demo</title>
 </svelte:head>
 
 <main>
-  <h1>🚀 SvelteKit AutoWrap Demo</h1>
+  <h1>🚀 SvelteKit Decorators Demo</h1>
   
   <div class="info">
     <p>Open the browser console (F12) to see automatic logs!</p>
     <p>Page loaded at: {data.timestamp}</p>
     <p>URL: {data.url}</p>
-    <p><a href="/opt-out-test">Test Opt-out Page</a> (without wrapper)</p>
+    <p><a href="/opt-out-test">Test Opt-out Page</a> (without decorators)</p>
     <p><a href="/granular-test">Test Granular Configuration</a> (load yes, actions no)</p>
   </div>
 
@@ -70,7 +70,7 @@
     
     <p>
       All server-side functions are automatically wrapped by the 
-      <strong>vite-plugin-sveltekit-autowrap</strong> plugin without modifying the code!
+      <strong>vite-plugin-sveltekit-decorators</strong> plugin without modifying the code!
     </p>
   </section>
 </main>
