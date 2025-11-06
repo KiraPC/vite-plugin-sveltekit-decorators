@@ -14,12 +14,12 @@ describe('Transformer', () => {
   
   const mockServerAutowrapInfo = {
     filePath: 'src/+decorators.server.ts',
-    functions: ['loadDecorator']
+    availableDecorators: new Set(['loadDecorator', 'actionsDecorator', 'apiDecorator'])
   };
   
   const mockClientAutowrapInfo = {
     filePath: 'src/+decorators.ts',
-    functions: ['loadDecorator']
+    availableDecorators: new Set(['loadDecorator'])
   };
 
   describe('Load Function Transformation', () => {
@@ -32,8 +32,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -59,8 +58,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -86,8 +84,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -124,8 +121,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -161,8 +157,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -183,8 +178,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.js', 
-        {}, 
+        '/src/routes/+page.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         false // client-side
@@ -213,8 +207,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true // server-side
@@ -251,8 +244,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -274,8 +266,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/user/+page.server.js', 
-        {}, 
+        '/src/routes/user/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -299,8 +290,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -322,8 +312,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -342,8 +331,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/+page.server.js', 
-        {}, 
+        '/src/routes/+page.server.js',
         null, // no autowrap info
         null,
         true
@@ -366,8 +354,7 @@ describe('Transformer', () => {
       
       const result = transformFile(
         code, 
-        '/src/routes/auth/+page.server.js', 
-        {}, 
+        '/src/routes/auth/+page.server.js',
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         true
@@ -395,7 +382,6 @@ describe('Transformer', () => {
       const result = transformFile(
         code,
         '/src/routes/api/users/+server.js',
-        {},
         mockServerAutowrapInfo, 
         mockClientAutowrapInfo,
         {}
@@ -420,7 +406,6 @@ describe('Transformer', () => {
         code,
         '/src/routes/+page.js',
         {},
-        {},
         mockClientAutowrapInfo,
         false // isServerSide = false
       );
@@ -435,7 +420,6 @@ describe('Transformer', () => {
       const serverResult = transformFile(
         code,
         '/src/routes/+page.server.js',
-        {},
         mockServerAutowrapInfo,
         {},
         true // isServerSide = true

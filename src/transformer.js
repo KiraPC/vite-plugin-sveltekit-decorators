@@ -10,7 +10,7 @@ import { parseFile } from './parser.js';
 const babelGenerate = generate.default || generate;
 const babelTraverse = traverse.default || traverse;
 
-export function transformFile(code, filePath, config, serverAutowrapInfo, clientAutowrapInfo, isServerSide = true) {
+export function transformFile(code, filePath, serverAutowrapInfo, clientAutowrapInfo, isServerSide = true) {
   const parseResult = parseFile(code, filePath);
   const { functions, autowrapConfig } = parseResult;
   
@@ -71,7 +71,7 @@ export function transformFile(code, filePath, config, serverAutowrapInfo, client
                         // Find the function info for this specific action
                         const actionFunction = matchingFunctions.find(f => f.action === actionName);
                         if (actionFunction) {
-                          const shouldWrap = shouldWrapFunction(actionFunction, autowrapConfig);
+                          const shouldWrap = shouldWrapFunction(actionFunction, autowrapConfig, autowrapInfo);
                           
                           if (shouldWrap) {
                             neededWrappers.add('actions');
@@ -98,7 +98,7 @@ export function transformFile(code, filePath, config, serverAutowrapInfo, client
                   // Logic for load and other functions
                   const functionInfo = matchingFunctions[0];
                   if (functionInfo && declarator.init) {
-                    const shouldWrap = shouldWrapFunction(functionInfo, autowrapConfig);
+                    const shouldWrap = shouldWrapFunction(functionInfo, autowrapConfig, autowrapInfo);
                     
                     if (shouldWrap) {
                       const wrapperType = getWrapperType(functionInfo.type);
@@ -133,7 +133,7 @@ export function transformFile(code, filePath, config, serverAutowrapInfo, client
           const matchingFunction = functions.find(f => f.name === functionName);
           
           if (matchingFunction) {
-            const shouldWrap = shouldWrapFunction(matchingFunction, autowrapConfig);
+            const shouldWrap = shouldWrapFunction(matchingFunction, autowrapConfig, autowrapInfo);
             
             if (shouldWrap) {
               const wrapperType = getWrapperType(matchingFunction.type);
@@ -194,6 +194,8 @@ function getWrapperType(functionType) {
       return 'actions';
     case 'api':
       return 'api';
+    case 'remoteFunction':
+      return 'remoteFunction';
     default:
       return null;
   }
@@ -207,6 +209,8 @@ function getWrapperFunctionName(wrapperType) {
       return 'actionsDecorator';
     case 'api':
       return 'apiDecorator';
+    case 'remoteFunction':
+      return 'remoteFunctionDecorator';
   }
 }
 
@@ -233,7 +237,14 @@ function generateImports(neededWrappers, autowrapInfo, currentFilePath) {
   return imports.join('\n');
 }
 
-function shouldWrapFunction(functionInfo, autowrapConfig) {
+function shouldWrapFunction(functionInfo, autowrapConfig, autowrapInfo) {
+  const wrapperFunction = getWrapperFunctionName(functionInfo.type);
+  const isDecoratorAvailable = autowrapInfo.availableDecorators?.has(wrapperFunction) ?? false;
+  
+  if (!isDecoratorAvailable) {
+    return false;
+  }
+
   // If there's no granular configuration, use default (enabled)
   if (!autowrapConfig.granular) {
     return true;
@@ -266,7 +277,18 @@ function shouldWrapFunction(functionInfo, autowrapConfig) {
         return granular.api.includes(functionInfo.name);
       }
       return granular.api !== false; // Default: true
-      
+    
+    case 'remoteFunction':
+      if (granular.remoteFunction === false) {
+        return false; // Tutte le API routes disabilitate
+      }
+      if (Array.isArray(granular.remoteFunction)) {
+        // If it's an array, check if this specific function is in the array (ENABLED)
+        // remoteFunction: ['fetchData'] means "enable wrapping ONLY for fetchData"
+        return granular.remoteFunction.includes(functionInfo.name);
+      }
+      return granular.remoteFunction !== false; // Default: true
+
     default:
       return true;
   }
@@ -296,20 +318,49 @@ function createMetadata(functionInfo, filePath, isServerSide = true) {
   if (functionInfo.name && functionInfo.type === 'api') {
     metadata.method = functionInfo.name.toUpperCase();
   }
-  
+
+  // For remote functions, add the remoteType (wrapper function name)
+  if (functionInfo.type === 'remoteFunction') {
+    metadata.remoteType = functionInfo.wrapperFunction;
+  }
+
   return metadata;
 }
 
 function wrapFunction(node, functionInfo, metadata, wrapperType) {
   try {
-    const originalCode = babelGenerate(node).code;
     const wrapperName = getWrapperFunctionName(wrapperType);
-    
-    // Always pass metadata, but exclude sensitive info for client-side
     const metadataCode = JSON.stringify(metadata, null, 2);
+
+    if (wrapperType === 'remoteFunction') {
+      const wrapperFunctionName = functionInfo.wrapperFunction;
+      const functionArgIndex = functionInfo.functionArgumentIndex ?? 0;
+      const innerFunction = node.arguments[functionArgIndex];
+      
+      if (!innerFunction) {
+        return null;
+      }
+
+      const innerFunctionCode = babelGenerate(innerFunction).code;
+
+      const argsCode = node.arguments.map((arg, index) => {
+        if (index === functionArgIndex) {
+          // Wrap this argument (the function)
+          return `${wrapperName}(${innerFunctionCode}, ${metadataCode})`;
+        }
+
+        return babelGenerate(arg).code;
+      }).join(', ');
+      
+      return `${wrapperFunctionName}(${argsCode})`;
+    }
+
+    // Default behavior for non-wrapped functions
+    const originalCode = babelGenerate(node).code;
     return `${wrapperName}(${originalCode}, ${metadataCode})`;
   } catch (error) {
     console.warn(`Failed to wrap function ${functionInfo.name}:`, error);
     return null;
   }
 }
+

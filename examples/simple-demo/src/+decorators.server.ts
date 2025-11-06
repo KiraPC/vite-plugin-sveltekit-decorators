@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import type { ActionsDecorator, ApiDecorator, ServerLoadDecorator } from 'vite-plugin-sveltekit-decorators';
+import type { ActionsDecorator, ApiDecorator, RemoteFunctionDecorator, ServerLoadDecorator } from 'vite-plugin-sveltekit-decorators';
 
 // Decorator for server load functions
 export const loadDecorator: ServerLoadDecorator = (originalFunction, metadata) => {
@@ -90,6 +90,38 @@ export const apiDecorator: ApiDecorator = (originalFunction, metadata) => {
     } catch (error) {
       const duration = performance.now() - start;
       console.error(`❌ [API-${method}] Failed ${method} ${url} after ${duration.toFixed(2)}ms:`, error);
+      throw error;
+    }
+  };
+};
+
+// Decorator for Remote Functions (SvelteKit RPC)
+export const remoteFunctionDecorator: RemoteFunctionDecorator = (originalFunction, metadata) => {
+  return async (...args) => {
+    const start = performance.now();
+    const functionName = metadata.functionName;
+    const fileName = metadata.filePath.split('/').pop() || 'unknown';
+
+    console.log(`🚀 [REMOTE-FN] Calling remote function ${metadata.remoteType} '${functionName}' in ${fileName}`);
+    console.log(`📍 [REMOTE-FN] Location: ${metadata.filePath}:${metadata.startLine}-${metadata.endLine}`);
+    console.log(`📦 [REMOTE-FN] Arguments: ${args.length > 0 ? JSON.stringify(args, null, 2) : 'none'}`);
+    
+    try {
+      const result = await originalFunction(...args);
+      const duration = performance.now() - start;
+      
+      if (duration > 1000) {
+        console.warn(`⚠️  [REMOTE-FN] Slow remote function: '${functionName}' took ${duration.toFixed(2)}ms`);
+      } else {
+        console.log(`✅ [REMOTE-FN] Successfully completed '${functionName}' in ${duration.toFixed(2)}ms`);
+      }
+      
+      console.log(`📤 [REMOTE-FN] Result: ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}`);
+      
+      return result;
+    } catch (error) {
+      const duration = performance.now() - start;
+      console.error(`❌ [REMOTE-FN] Failed '${functionName}' after ${duration.toFixed(2)}ms:`, error);
       throw error;
     }
   };
