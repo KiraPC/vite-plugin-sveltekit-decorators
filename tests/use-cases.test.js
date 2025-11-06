@@ -5,6 +5,7 @@ import { transformFile } from '../src/transformer.js';
 describe('Real-World Use Cases', () => {
   const mockAutowrapInfo = {
     filePath: '/src/+decorators.server.js',
+    availableDecorators: new Set(['loadDecorator', 'actionsDecorator', 'apiDecorator']),
     functions: {
       load: 'loadDecorator',
       actions: 'actionsDecorator',
@@ -78,7 +79,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/products/[id]/+page.server.js',
-        {},
         mockAutowrapInfo,
         null,
         true
@@ -120,7 +120,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/admin/products/+page.server.js',
-        {},
         mockAutowrapInfo,
         null,
         true
@@ -195,7 +194,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/auth/+page.server.js',
-        {},
         mockAutowrapInfo,
         null,
         true
@@ -258,7 +256,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/api/users/+server.js',
-        {},
         mockAutowrapInfo,
         {},
         {}
@@ -318,7 +315,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/data/+page.server.js',
-        {},
         mockAutowrapInfo,
         null,
         true
@@ -366,7 +362,6 @@ describe('Real-World Use Cases', () => {
       const transformResult = transformFile(
         code,
         '/src/routes/large/+page.server.js',
-        {},
         mockAutowrapInfo,
         null,
         true

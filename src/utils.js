@@ -1,5 +1,11 @@
-import { existsSync } from 'node:fs';
+import { parse } from '@babel/parser';
+import traverse from '@babel/traverse';
+import * as t from '@babel/types';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+
+// Handle default export for traverse
+const babelTraverse = traverse.default || traverse;
 
 export function debugLog(message, ...args) {
   if (process.env.DEBUG_SVELTEKIT_DECORATORS) {
@@ -46,12 +52,53 @@ export function loadAutowrapFunctions(autowrapFilePath) {
   }
 
   try {
-    // Calcola il path relativo correttamente
     const relativePath = path.relative(process.cwd(), autowrapFilePath).replace(/\\/g, '/');
+  
+    const fileContent = readFileSync(autowrapFilePath, 'utf-8');
+    const availableDecorators = new Set();
+    
+    // Parse the file with Babel to extract exported decorators
+    const ast = parse(fileContent, {
+      sourceType: 'module',
+      plugins: ['typescript', 'jsx'],
+    });
+    
+    // Decorators we're looking for
+    const decoratorNames = new Set([
+      'loadDecorator',
+      'serverLoadDecorator', 
+      'actionsDecorator',
+      'apiDecorator',
+      'remoteFunctionDecorator'
+    ]);
+    
+    // Traverse AST to find exported decorator functions
+    babelTraverse(ast, {
+      ExportNamedDeclaration(path) {
+        const declaration = path.node.declaration;
+        
+        // Handle: export const loadDecorator = ...
+        if (t.isVariableDeclaration(declaration)) {
+          for (const declarator of declaration.declarations) {
+            if (t.isIdentifier(declarator.id) && decoratorNames.has(declarator.id.name)) {
+              availableDecorators.add(declarator.id.name);
+            }
+          }
+        }
+        
+        // Handle: export function loadDecorator() { ... }
+        if (t.isFunctionDeclaration(declaration) && declaration.id) {
+          if (decoratorNames.has(declaration.id.name)) {
+            availableDecorators.add(declaration.id.name);
+          }
+        }
+      }
+    });
     
     return {
       filePath: autowrapFilePath,
       relativePath: relativePath.startsWith('.') ? relativePath : `./${relativePath}`,
+      availableDecorators,
     };
   } catch (error) {
     console.warn('Failed to load autowrap functions:', error);

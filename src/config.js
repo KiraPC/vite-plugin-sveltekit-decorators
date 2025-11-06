@@ -57,7 +57,6 @@ export function findAutowrapFiles(basePath, config) {
 }
 
 export function shouldProcessFile(filePath) {
-  // Always process SvelteKit files, individual files can opt-out with `export const autowrap = false`
   return isSvelteKitFile(filePath);
 }
 
@@ -67,6 +66,7 @@ export function isSvelteKitFile(filePath) {
     /\/\+layout\.server\.(js|ts)$/,
     /\/\+page\.(js|ts)$/,
     /\/\+layout\.(js|ts)$/,
+    /\/*remote\.(js|ts)$/,
     /\/\+server\.(js|ts)$/,  // API routes
   ];
 
