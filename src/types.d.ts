@@ -34,12 +34,18 @@ export interface ApiDecoratorMetadata extends ServerDecoratorMetadata {
   method: string; // HTTP method (GET, POST, etc.)
 }
 
+export interface RemoteFunctionDecoratorMetadata extends ServerDecoratorMetadata {
+  functionType: 'remoteFunction';
+  functionName: string;
+  remoteType: string; // Type of remote function (e.g., 'prerender', 'query', etc.)
+}
+
 // Client-specific metadata types
 export interface ClientLoadDecoratorMetadata extends ClientDecoratorMetadata {
   functionType: 'load';
 }
 
-export type ServerDecoratorMetadataTypes = ServerLoadDecoratorMetadata | ActionsDecoratorMetadata | ApiDecoratorMetadata;
+export type ServerDecoratorMetadataTypes = ServerLoadDecoratorMetadata | ActionsDecoratorMetadata | ApiDecoratorMetadata | RemoteFunctionDecoratorMetadata;
 export type ClientDecoratorMetadataTypes = ClientLoadDecoratorMetadata;
 
 // Legacy type for backward compatibility
@@ -58,6 +64,7 @@ export interface DecoratorsConfig {
       load?: boolean;
       actions?: boolean | string[]; // true/false for all, array for specific actions
       api?: boolean | string[]; // true/false for all, array for specific HTTP methods
+      remoteFunctions?: boolean | string[]; // true/false for all, array for specific function names
     };
     [key: string]: any;
   };
@@ -68,6 +75,7 @@ export interface DecoratorFunctions {
   serverLoadDecorator?: ServerLoadDecorator;
   actionsDecorator?: ActionsDecorator;
   apiDecorator?: ApiDecorator;
+  remoteFunctionDecorator?: RemoteFunctionDecorator;
 }
 
 // SvelteKit Load Function Types
@@ -103,5 +111,13 @@ export type ApiDecorator = (
   originalApiHandler: ApiRouteHandler,
   metadata: ApiDecoratorMetadata
 ) => ApiRouteHandler;
+
+// Remote Function Types (SvelteKit's new RPC feature)
+export type RemoteFunction<T extends any[], R> = (...args: T) => Promise<R>;
+
+export type RemoteFunctionDecorator = <T extends any[], R>(
+  originalRemoteFunction: RemoteFunction<T, R>,
+  metadata: RemoteFunctionDecoratorMetadata
+) => RemoteFunction<T, R>;
 
 export declare function svelteKitDecorators(config?: PluginConfig): any;

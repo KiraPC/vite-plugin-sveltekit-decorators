@@ -10,7 +10,7 @@ Experience the plugin in action with a live, interactive demo. No installation r
 
 ## The Problem
 
-SvelteKit lacks a built-in way to execute common code across multiple functions (load functions, actions, API routes). This plugin solves that by providing a decorator pattern that allows you to:
+SvelteKit lacks a built-in way to execute common code across multiple functions (load functions, actions, API routes, remote functions). This plugin solves that by providing a decorator pattern that allows you to:
 
 - Add logging to all your SvelteKit functions
 - Implement analytics tracking
@@ -18,6 +18,7 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
 - Add authentication checks
 - Measure performance
 - Execute any custom logic before/after your functions
+- Monitor remote function calls (RPC)
 
 ## Quick Start
 
@@ -52,7 +53,8 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
    import type { 
      ServerLoadDecorator, 
      ActionsDecorator, 
-     ApiDecorator 
+     ApiDecorator,
+     RemoteFunctionDecorator
    } from 'vite-plugin-sveltekit-decorators';
 
    export const loadDecorator: ServerLoadDecorator = (originalFunction, metadata) => {
@@ -75,6 +77,15 @@ SvelteKit lacks a built-in way to execute common code across multiple functions 
      return async (event) => {
        console.log(`API ${metadata.method} request to ${metadata.functionName}`);
        return await originalFunction(event);
+     };
+   };
+
+   export const remoteFunctionDecorator: RemoteFunctionDecorator = (originalFunction, metadata) => {
+     return async (...args) => {
+       console.log(`Calling remote function ${metadata.functionName}...`);
+       const result = await originalFunction(...args);
+       console.log(`Remote function ${metadata.functionName} completed`);
+       return result;
      };
    };
    ```
@@ -101,6 +112,7 @@ Check out our [complete working example](./examples/simple-demo/) which demonstr
 | `loadDecorator` | Server-side load functions | `src/+decorators.server.ts` | Page/layout `load` functions on server |
 | `actionsDecorator` | Form actions | `src/+decorators.server.ts` | Page `actions` (default, named) |
 | `apiDecorator` | API route handlers | `src/+decorators.server.ts` | API routes (`GET`, `POST`, etc.) |
+| `remoteFunctionDecorator` | Remote functions (RPC) | `src/+decorators.server.ts` | Functions in `.remote.ts` file |
 
 ### Configuration Options
 
@@ -141,6 +153,8 @@ Configuration options:
 - `string[]`: Enable only for specific actions/HTTP methods
 
 **This follows the exact same pattern as SvelteKit's built-in configuration** - no new concepts to learn!
+
+> **Note:** Remote functions (`.remote.ts` files) do not currently support granular configuration via `export const config` due to SvelteKit restrictions. Decorators are applied to all remote functions if `remoteFunctionDecorator` is defined.
 
 ## Type Safety
 
@@ -244,6 +258,45 @@ export const loadDecorator: ServerLoadDecorator = (originalFunction, metadata) =
       console.warn(`Slow load function: ${metadata.functionName} (${duration}ms)`);
     }
     
+    return result;
+  };
+};
+```
+
+### Remote Functions (RPC)
+
+Decorate SvelteKit's remote functions in `.remote.ts` files:
+
+```typescript
+// src/lib/api.remote.ts
+import z from 'zod';
+import { prerender } from '$app/server';
+
+export const getUser = prerender(async () => {
+  // This function will be automatically decorated
+  return { name: 'John Doe' };
+});
+
+// With validation
+export const updateProfile = prerender(
+  z.string(),  // validation function
+  async (name) => {          // remote function (decorated)
+    return { name: name };
+  }
+);
+```
+
+The `remoteFunctionDecorator` wraps the inner function:
+
+```typescript
+export const remoteFunctionDecorator: RemoteFunctionDecorator = (originalFunction, metadata) => {
+  return async (...args) => {
+    console.log(`🚀 Remote function called: ${metadata.functionName}`);
+    console.log(`📦 Arguments:`, args);
+    
+    const result = await originalFunction(...args);
+    
+    console.log(`✅ Result:`, result);
     return result;
   };
 };

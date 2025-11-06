@@ -94,7 +94,7 @@ export function svelteKitDecorators(userConfig = {}) {
       debugLog(`Processing ${isServerFile ? 'server' : 'client'} file:`, filePath);
       
       try {
-        const result = transformFile(code, filePath, config, serverAutowrapInfo, clientAutowrapInfo, isServerFile);
+        const result = transformFile(code, filePath, serverAutowrapInfo, clientAutowrapInfo, isServerFile);
         
         if (result.changed) {
           debugLog('Transformed file:', filePath);
